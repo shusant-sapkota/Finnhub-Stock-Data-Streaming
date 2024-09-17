@@ -38,9 +38,6 @@ def data_to_broker(producer, topic):
         except Exception as e:
             print(f'Error Encountered: {e}')
         time.sleep(5)
-        break
-
-
 
 
 if __name__=="__main__":
