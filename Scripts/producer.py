@@ -8,7 +8,9 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 finnhub_client = finnhub.Client(os.getenv('FINNHUB_API_KEY'))
-print(finnhub_client)
+#print(finnhub_client)
+
+company = 'AAPL'
 
 # Stock candles
 #res = finnhub_client.stock_candles('AAPL', 'D', 1590988249, 1591852249)
@@ -25,7 +27,10 @@ def delivery_report(err,msg):
 
 def data_to_broker(producer, topic):
     while True:
-        data = finnhub_client.quote(symbol='AAPL')
+        data = finnhub_client.quote(symbol=company)
+        #print(data)
+        #print(type(data))
+        data['company'] = company
         try:
             producer.produce(
                 topic,

@@ -1,5 +1,22 @@
 version: '3'
 
+x-spark-common: &spark-common
+  #image: bitnami/spark:latest
+  image: finnhub_spark_image
+  volumes:
+    - ./scripts:/opt/bitnami/spark/scripts
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7076
+  #command: sh -c "pip install -r /opt/bitnami/spark/requirements.txt && bin/spark-class org.apache.spark.deploy.master.Master"
+  depends_on:
+    - spark-master
+  environment:
+    SPARK_MODE: Worker
+    SPARK_WORKER_CORES: 2
+    SPARK_WORKER_MEMORY: 1g
+    SPARK_MASTER_URL: spark://finnhub-spark-master:7076
+  networks:
+    - finnhubnetwork
+
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -57,16 +74,25 @@ services:
       retries: 5
 
   spark-master:
-    image: bitnami/spark:latest
+    #image: bitnami/spark:latest
+    image: finnhub_spark_image
     container_name: finnhub-spark-master
     volumes:
       - ./scripts:/opt/bitnami/spark/scripts
-      - .requirements.txt:/opt/bitnami/spark/requirements.txt
     command: bin/spark-class org.apache.spark.deploy.master.Master
     ports:
       - "7075:7075"
       - "7076:7076"
     networks:
       - finnhubnetwork
+
+  finnhub-spark-worker-1:
+    <<: *spark-common
+  finnhub-spark-worker-2:
+    <<: *spark-common
+
+
 networks:
   finnhubnetwork:
+
+
